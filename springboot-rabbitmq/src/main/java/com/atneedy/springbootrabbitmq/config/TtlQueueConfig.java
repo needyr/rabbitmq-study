@@ -21,8 +21,11 @@ public class TtlQueueConfig {
     //普通队列名称
     public static final String QUEUE_A = "QA";
     public static final String QUEUE_B = "QB";
+    //通用队列名称
+    public static final String QUEUE_C = "QC";
     //死信队列名称
     public static final String DEAD_QUEUE = "QD";
+
 
     //声明普通交换机 bean里面的是别名 注入的时候用
     @Bean("normalExchange")
@@ -60,6 +63,17 @@ public class TtlQueueConfig {
                 .build();
     }
 
+    //声明队列C
+    @Bean("queueC")
+    public Queue queueC() {
+        return QueueBuilder
+                .nonDurable(QUEUE_C)
+                .autoDelete()
+                .deadLetterExchange(DEAD_EXCHANGE)
+                .deadLetterRoutingKey("YD")
+                .build();
+    }
+
     //声明死信队列
     @Bean("deadQueue")
     public Queue deadQueue() {
@@ -85,6 +99,14 @@ public class TtlQueueConfig {
 
         return BindingBuilder
                 .bind(queueB).to(normalExchange).with("XB");
+    }
+
+    @Bean
+    public Binding queueCBinding(@Qualifier("queueC") Queue queueC,
+                                 @Qualifier("normalExchange") DirectExchange normalExchange){
+
+        return BindingBuilder
+                .bind(queueC).to(normalExchange).with("XC");
     }
 
     @Bean
